@@ -1,8 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
     </style>
+	
+	<style name="shelfType">
+	    <item name="android:layout_width">match_parent</item>
+	    <item name="android:layout_height">match_parent</item>
+	    <item name="android:layout_weight">0.33</item>
+	    <item name="android:orientation">vertical</item>
+	</style>
+
+	<dimen name="textview_height">180dp</dimen>
+	<dimen name="textview_width">150dp</dimen>
+	<dimen name="ball_radius">30dp</dimen>
+	<dimen name="font_size">16sp</dimen>
 
 </resources>

@@ -1,5 +1,7 @@
 package com.makeinfo.flowerpi;
 
+import android.app.ListActivity;
+
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -9,82 +11,71 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.graphics.Point;
+import android.widget.HorizontalScrollView;
+import android.content.Context;
+
+import android.widget.ListView;
+import android.widget.Toast;
 
 // import com.makeinfo.flowerpi.API.gitapi;
 import com.makeinfo.flowerpi.API.tveapi;
 import com.makeinfo.flowerpi.model.PageModel;
+import com.makeinfo.flowerpi.model.Module;
+import com.makeinfo.flowerpi.model.Datum;
+import com.makeinfo.flowerpi.adapter;
 import com.makeinfo.flowerpi.model.VideoModel;
 import com.makeinfo.flowerpi.model.ProgramModel;
+
+import java.util.List;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
+public class MainActivity extends ListActivity {
 
-public class MainActivity extends ActionBarActivity {
-
-    Button click;
-    TextView tv;
-    EditText edit_user;
-    ProgressBar pbar;
+    List<Datum> datumList;
+    HorizontalScrollView hscroll;
     String API = "http://dev-api.nbcuni.com/tve/";
+    Module firstModule = null;
+    Datum firstDatum = null;
+    String firstImage = null;
+
+    Context context = this;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        click = (Button) findViewById(R.id.button);
-        tv = (TextView) findViewById(R.id.tv);
-        edit_user = (EditText) findViewById(R.id.edit);
-        pbar = (ProgressBar) findViewById(R.id.pb);
-        pbar.setVisibility(View.INVISIBLE);
-        click.setOnClickListener(new View.OnClickListener() {
+        final RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(API).build();
+        tveapi tve = restAdapter.create(tveapi.class);
+        android.view.Display display = ((android.view.WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        Point thePoint = new Point();
+        display.getSize(thePoint);
+
+        tve.getPage("usa-roku", "testhomepage", new Callback<PageModel>() {
+
             @Override
-            public void onClick(View v) {
-                String user = edit_user.getText().toString();
-                pbar.setVisibility(View.VISIBLE);
-                RestAdapter restAdapter = new RestAdapter.Builder()
-                        .setEndpoint(API).build();
-                tveapi tve = restAdapter.create(tveapi.class);
+            public void success(PageModel pageModel, Response response) {
+                Module firstModule = pageModel.modules.get(0);
+                if (null != firstModule) datumList = firstModule.data;
+                if (null != firstDatum) firstImage = firstDatum.hdposterurl;
 
-                tve.getPage("usa-roku","home",new Callback<PageModel>() {
-                    @Override
-                    public void success(PageModel pageModel, Response response) {
-                        tv.setText("Github Name :"+pageModel.appId+"\nWebsite :"+pageModel.name+"\nCompany Name :"+pageModel.alias);
-                        pbar.setVisibility(View.INVISIBLE);
-                    }
+                adapter adapt = new adapter(getApplicationContext(), R.layout.item_file, datumList);
+                //ListView listView = (ListView) findViewById(R.id.list);
+                setListAdapter(adapt);
+            }
 
-                    @Override
-                    public void failure(RetrofitError error) {
-                     tv.setText(error.getMessage());
-                        pbar.setVisibility(View.INVISIBLE);
-                    }
-                });
+            @Override
+            public void failure(RetrofitError error) {
+                Toast.makeText(getApplicationContext(), "Failed", Toast.LENGTH_SHORT).show();
             }
         });
-    }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }

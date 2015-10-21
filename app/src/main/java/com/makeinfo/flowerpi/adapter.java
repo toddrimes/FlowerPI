@@ -32,8 +32,8 @@ public class adapter extends ArrayAdapter<Datum> {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.item_file,parent,false);
         Datum video = datumList.get(position);
-        // TextView tv = (TextView) view.findViewById(R.id.name);
-        // tv.setText(video.title);
+        TextView tv = (TextView) view.findViewById(R.id.name);
+        tv.setText(video.title);
         ImageView img = (ImageView) view.findViewById(R.id.img);
         Picasso.with(getContext()).load(video.hdposterurl).resize(320,180).into(img);
         return view;
